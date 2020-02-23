@@ -1,0 +1,92 @@
+//I got this information from this github: jldbc/pybaseball
+//The reason i am copying and pasting this info in a file is so i'm inspired
+//to hack on this later and so i know where the docs are.....i believe the above
+//address is the developer of pybasball, i could be wrong.....
+//if you were running this code you would have to change edit for comments
+//in Python use # mark for one line comments etc....
+
+Comparing the Dominance of Three of the Best All-Time Teams
+A quick analysis and visuzliation of three of the best baseball seasons that have ever happened: the 1976 Cincinnati Reds, 2001 Seattle Mariners, and the 1927 "Murderers Row" New York Yankees.
+
+In [1]:
+from pybaseball import schedule_and_record
+import numpy as np
+import matplotlib.pyplot as plt
+%matplotlib inline
+In [2]:
+yankees = schedule_and_record(1927, 'NYY')
+reds = schedule_and_record(1976, 'CIN')
+mariners = schedule_and_record(2001, 'SEA')
+Summary Statistics
+Let's start by looking at some summary stats on each team's season. The '01 Mainers had the best hot streak of all, winning 15 straight at one point. The '27 Yankees, however, had the highest scoring offense with an impressive 6.3 runs per game.
+
+In [3]:
+mariners.describe()
+Out[3]:
+R	RA	Inn	Rank	Attendance	Streak
+count	162.000000	162.000000	162.000000	162.0	162.000000	162.000000
+mean	5.722222	3.870370	9.166667	1.0	37564.376543	2.080247
+std	3.406698	3.009589	0.680245	0.0	10771.969761	3.315648
+min	0.000000	0.000000	9.000000	1.0	11687.000000	-4.000000
+25%	3.000000	2.000000	9.000000	1.0	30071.000000	-1.000000
+50%	5.000000	3.000000	9.000000	1.0	42362.000000	2.000000
+75%	8.000000	5.000000	9.000000	1.0	45651.750000	3.000000
+max	16.000000	15.000000	14.000000	1.0	61065.000000	15.000000
+In [4]:
+reds.describe()
+Out[4]:
+R	RA	Inn	Rank	Attendance	Streak
+count	162.000000	162.000000	162.000000	162.000000	154.000000	162.000000
+mean	5.290123	3.907407	9.246914	1.135802	29033.474026	0.839506
+std	3.330048	2.797083	1.033968	0.361264	13331.318368	2.084887
+min	0.000000	0.000000	7.000000	1.000000	5219.000000	-4.000000
+25%	3.000000	2.000000	9.000000	1.000000	18227.250000	-1.000000
+50%	5.000000	3.000000	9.000000	1.000000	28114.000000	1.000000
+75%	7.000000	5.000000	9.000000	1.000000	38292.500000	2.000000
+max	14.000000	14.000000	16.000000	3.000000	53652.000000	7.000000
+In [5]:
+yankees.describe()
+Out[5]:
+R	RA	Inn	Rank	Attendance	Streak
+count	155.000000	155.000000	155.000000	155.0	132.000000	155.000000
+mean	6.290323	3.864516	9.103226	1.0	20977.787879	1.735484
+std	3.939424	2.817103	0.968157	0.0	14789.945028	2.588881
+min	0.000000	0.000000	5.000000	1.0	1500.000000	-4.000000
+25%	3.000000	2.000000	9.000000	1.0	10000.000000	-1.000000
+50%	6.000000	3.000000	9.000000	1.0	15500.000000	2.000000
+75%	8.000000	6.000000	9.000000	1.0	30000.000000	3.000000
+max	21.000000	14.000000	18.000000	1.0	72641.000000	9.000000
+Next let's take a look at their records and runs.
+Here the Yankees and Mariners are similar, while the Big Red Machine lags behind. Point Mariners and Yankees.
+
+In [6]:
+# create a numeric indicator of a win and take cumulative sum of wins-to-date at each point in the season
+mariners['win-count'] = np.where(mariners['W/L']=='W', 1, 0).cumsum()
+yankees['win-count'] = np.where(yankees['W/L']=='W', 1, 0).cumsum()
+reds['win-count'] = np.where(reds['W/L']=='W', 1, 0).cumsum()
+In [7]:
+plt.plot(mariners['win-count'],label=" '01 Mariners")
+plt.plot(yankees['win-count'],label=" '27 Yankees")
+plt.plot(reds['win-count'],label=" '76 Reds")
+plt.legend(loc=4)
+plt.xlabel('Games into Season')
+plt.ylabel('Win Count')
+plt.title('Record Throughout Season');
+
+Last let's take a look at score differential
+Who had the largest win margins? The plot below shows cumulative run differential throughout the season. The Yankees are the clear winners of this one, which is saying a lot considering they are being compared against two of the best teams of all time! Point Murderers Row.
+
+In [8]:
+mariners['scorediff'] = (mariners['R'] - mariners['RA']).cumsum()
+yankees['scorediff'] = (yankees['R'] - yankees['RA']).cumsum()
+reds['scorediff'] = (reds['R'] - reds['RA']).cumsum()
+In [9]:
+plt.plot(mariners['scorediff'],label=" '01 Mariners")
+plt.plot(yankees['scorediff'],label=" '27 Yankees")
+plt.plot(reds['scorediff'],label=" '76 Reds")
+plt.legend(loc=4)
+plt.xlabel('Games into Season')
+plt.ylabel('Runs Scored - Runs Against')
+plt.title('Cumulative Run Differential');
+
+While all three legendary seasons are memorable, this brief analysis points toward the 1927 Yankees as being the best of the three.
